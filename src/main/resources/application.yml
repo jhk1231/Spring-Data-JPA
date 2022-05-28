@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/datajpa
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+#        show_sql: true
+        format_sql: true #쿼리가 1줄이 아닌 여러줄 이쁘게 출력
+
+logging.level:
+  org.hibernate.SQL: debug
+#  org.hibernate.type: trace # 파라미터 입력값까지 확인 가능
