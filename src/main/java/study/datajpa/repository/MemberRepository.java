@@ -1,6 +1,10 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
@@ -52,5 +56,30 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOptionalByUsername(String username);
 
 
+    /**
+     * Paging
+     */
+//    Page<Member> findByAge(int age, Pageable pageable);
 
+    /**
+     * Count 쿼리 분리하는법
+     * Count Query는 기본이 left join
+     * Count Query를 분리하지 않는다면 Count Query에서도 원장 쿼리에 적용된 복잡한 join문 같은 쿼리가 실행되어서 성능상에서 손해가 발생할 수 있다.
+     */
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery = "select count(m.username) from Member m"
+    )
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    Slice<Member> findSliceByAge(int age, Pageable pageable);
+
+
+    /**
+     * Bulk성 수정 쿼리
+     * @Modifying이 있어야 excute쿼리가 나가서 수정 쿼리가 실행된다.
+     * clearAutomatically = true : 해당 쿼리가 나간후 clear를 자동으로 해준다.
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 }
